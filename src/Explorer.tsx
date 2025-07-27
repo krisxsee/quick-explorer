@@ -49,16 +49,7 @@ export class Explorer extends PerWindowComponent {
     onload() {
         // Try to close any open menu before unloading
         this.register(() => this.lastMenu?.hide());
-        if (requireApiVersion("0.15.6")) {
-            const originalTitleEl = this.win.document.body.find(".titlebar .titlebar-inner .titlebar-text");
-            const titleEl = originalTitleEl?.cloneNode(true) as HTMLElement;
-            if (titleEl) { // CPHATB plugin might have removed/replaced the original
-                titleEl.addClass("qe-replacement");
-                titleEl.textContent = app.getAppTitle?.() ?? this.win.document.title;
-                originalTitleEl.replaceWith(titleEl);
-                this.register(() => titleEl.replaceWith(originalTitleEl));
-            }
-        }
+        // Titlebar text replacement removed - using native titlebar stats
 
         if (requireApiVersion("0.16.0")) this.win.document.body.addClass("obsidian-themepocalypse");
 
@@ -85,43 +76,22 @@ export class Explorer extends PerWindowComponent {
             ));
         }
 
-        const buttonContainer = this.win.document.body.find(
-            "body:not(.is-hidden-frameless) .titlebar .titlebar-button-container.mod-left"
-        ) || statusBarItem(this, this.win, "left-region");
+        // Path bar removed - using native breadcrumbs only
 
-        this.register(() => unmount(buttonContainer, this));
-        mount(buttonContainer, this);
-
-        if (this.isCurrent()) {
-            this.update(this.app.workspace.getActiveFile());
-        } else {
-            const leaf = app.workspace.getMostRecentLeaf(this.container);
-            const file = (leaf?.view instanceof FileView) && leaf.view.file;
-            if (file) this.update(file);
-        }
+        // Path bar update removed - using native breadcrumbs only
 
         this.registerEvent(this.app.vault.on("rename", this.onFileChange, this));
         this.registerEvent(this.app.vault.on("delete", this.onFileDelete, this));
 
-        this.el.on("contextmenu", ".explorable", (event, target) => {
-            const { filePath } = target.dataset;
-            const file = this.app.vault.getAbstractFileByPath(filePath);
-            new ContextMenu(this.app, file).cascade(target, event);
-        });
-        this.el.on("click", ".explorable", (event, target) => {
-            this.folderMenu(target, event.isTrusted && event);
-        });
-        this.el.on('dragstart', ".explorable", (event, target) => {
-            startDrag(this.app, target.dataset.filePath, event);
-        });
+        // Custom path bar event handlers removed - using native breadcrumbs only
     }
 
     onFileChange(file: TAbstractFile) {
-        if (file === this.lastFile) this.update(file);
+        // File change handling removed - using native breadcrumbs only
     }
 
     onFileDelete(file: TAbstractFile) {
-        if (file === this.lastFile) this.update();
+        // File delete handling removed - using native breadcrumbs only
     }
 
     visibleCrumb(opener: HTMLElement) {
@@ -184,13 +154,7 @@ export class Explorer extends PerWindowComponent {
     }
 
     update(file?: TAbstractFile) {
-        if (this.isOpen) return;
-        file ??= this.app.vault.getAbstractFileByPath("/");
-        if (file == this.lastFile && file.path == this.lastPath) return;
-        this.lastFile = file;
-        this.lastPath = file.path;
-        const parts = hierarchy(file);
-        this.list.update(parts);
+        // Path bar update removed - using native breadcrumbs only
     }
 
 }
